@@ -48,7 +48,7 @@ TX_FEES = {
 # TODO: define set of known contract formats and make this fee for unknown contracts configurable
 KT1_FEE_SAFETY_CHECK = True
 FEE_LIMIT_CONTRACTS = 100000
-ZERO_THRESHOLD = 1  # too less to payout in mutez
+ZERO_THRESHOLD = 1000  # too less to payout in mutez
 MAX_TX_PER_BLOCK_TZ = 550
 MAX_TX_PER_BLOCK_KT = 25
 

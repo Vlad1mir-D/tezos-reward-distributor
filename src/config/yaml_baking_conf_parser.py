@@ -31,6 +31,8 @@ from model.baking_conf import (
     DEXTER,
     CONTRACTS_SET,
     REWARDS_TYPE,
+    MIN_PAYMENT_AMT,
+    MIN_PAYMENT_KEY,
 )
 from util.address_validator import AddressValidator
 from util.fee_validator import FeeValidator
@@ -80,6 +82,7 @@ class BakingYamlConfParser(YamlConfParser):
         self.parse_bool(conf_obj, DELEGATOR_PAYS_XFER_FEE, True)
         self.parse_bool(conf_obj, REACTIVATE_ZEROED, None)
         self.parse_bool(conf_obj, DELEGATOR_PAYS_RA_FEE, None)
+        self.validate_min_payment_amt(conf_obj)
 
     def set(self, key, value):
         self.conf_obj[key] = value
@@ -115,6 +118,10 @@ class BakingYamlConfParser(YamlConfParser):
         # default destination for min_delegation filtered account rewards
         if MIN_DELEGATION_KEY not in conf_obj[RULES_MAP]:
             conf_obj[EXCLUDED_DELEGATORS_SET_TOB].add(MIN_DELEGATION_KEY)
+
+        # default destination for min_payment filtered account rewards
+        if MIN_PAYMENT_KEY not in conf_obj[RULES_MAP]:
+            conf_obj[EXCLUDED_DELEGATORS_SET_TOB].add(MIN_PAYMENT_KEY)
 
     def validate_share_map(self, conf_obj, map_name):
         """
@@ -173,6 +180,18 @@ class BakingYamlConfParser(YamlConfParser):
             raise ConfigurationException(
                 "Invalid value:'{}'. {} parameter value must be an non negative integer".format(
                     conf_obj[MIN_DELEGATION_AMT], MIN_DELEGATION_AMT
+                )
+            )
+
+    def validate_min_payment_amt(self, conf_obj):
+        if MIN_PAYMENT_AMT not in conf_obj:
+            conf_obj[MIN_PAYMENT_AMT] = 0
+            return
+
+        if not self.validate_non_negative_int(conf_obj[MIN_PAYMENT_AMT]):
+            raise ConfigurationException(
+                "Invalid value:'{}'. {} parameter value must be an non negative integer".format(
+                    conf_obj[MIN_PAYMENT_AMT], MIN_PAYMENT_AMT
                 )
             )
 
@@ -384,8 +403,8 @@ class BakingYamlConfParser(YamlConfParser):
 
         addr_validator = AddressValidator(RULES_MAP)
         for key, value in conf_obj[RULES_MAP].items():
-            # validate key (and address or MINDELEGATION)
-            if key != MIN_DELEGATION_KEY:
+            # validate key (and address or MINDELEGATION OR MINPAYMENT)
+            if key != MIN_DELEGATION_KEY and key != MIN_PAYMENT_KEY:
                 addr_validator.validate(key)
             # validate destination value (An address OR TOF OR TOB OR TOE)
             if value not in [TOF, TOB, TOE]:

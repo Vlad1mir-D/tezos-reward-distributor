@@ -35,6 +35,7 @@ class PhasedPaymentCalculator:
         owners_map,
         service_fee_calculator,
         min_delegation_amount,
+        min_payment_amount,
         rules_model,
     ):
         self.rules_model = rules_model
@@ -42,6 +43,7 @@ class PhasedPaymentCalculator:
         self.founders_map = founders_map
         self.fee_calc = service_fee_calculator
         self.min_delegation_amnt = min_delegation_amount
+        self.min_payment_amnt = min_payment_amount
 
     #
     # calculation details
@@ -122,7 +124,9 @@ class PhasedPaymentCalculator:
         rwrd_logs, total_rwrd_amnt = phase4.calculate(rwrd_logs, total_rwrd_amnt)
 
         # calculate amounts
-        phase_last = CalculatePhaseFinal()
+        phase_last = CalculatePhaseFinal(
+            self.rules_model.exclusion_set1, self.rules_model.exclusion_set3, self.min_payment_amnt
+        )
         rwrd_logs, total_rwrd_amnt = phase_last.calculate(
             rwrd_logs, total_rwrd_amnt, adjustments
         )

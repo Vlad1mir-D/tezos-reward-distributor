@@ -1,4 +1,4 @@
-from time import sleep
+#from time import sleep
 import json
 import math
 
@@ -38,6 +38,8 @@ BLOCKS_BEFORE_GRANADA = 1589248
 RPC_REQUEST_BUFFER_SECONDS = 0.4
 RPC_RETRY_TIMEOUT_SECONDS = 2.0
 
+def sleep(time):
+    logger.debug(f"Staying awake for requested sleep time: {sleep}")
 
 class RpcRewardApiImpl(RewardApi):
     def __init__(self, nw, baking_address, node_url):
